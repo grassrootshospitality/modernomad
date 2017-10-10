@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+
+if [ -z $1 ]; then
+  echo "Usage: script/deploy-heroku APP_NAME"
+  exit 1
+fi
+
+APP_NAME=$1
+
+echo "Creating web image..."
+docker build -t registry.heroku.com/$APP_NAME/web .
+
+echo "Creating worker image..."
+# Heroku doesn't let us change the command that is run, so make an identical
+# image with a different command
+docker build --build-arg CUSTOM_CMD=scripts/celeryd -t registry.heroku.com/$APP_NAME/worker .
+
+exit 0
+
+echo "Deploying..."
+docker push registry.heroku.com/$APP_NAME/web
+docker push registry.heroku.com/$APP_NAME/worker
