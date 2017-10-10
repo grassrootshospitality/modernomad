@@ -1,0 +1,11 @@
+version: "3.0"
+services:
+  web:
+    build: .
+    cached: true
+    environment:
+      - "SECRET_KEY=insecure - only for testing"
+    links:
+      - postgres
+  postgres:
+    image: postgres
