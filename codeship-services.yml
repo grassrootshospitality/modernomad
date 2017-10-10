@@ -1,7 +1,9 @@
 version: "3.0"
 services:
   web:
-    build: .
+    build:
+      dockerfile: Dockerfile
+      image: registry.heroku.com/grassrootshospitality/web
     cached: true
     environment:
       - "SECRET_KEY=insecure - only for testing"
@@ -9,3 +11,14 @@ services:
       - postgres
   postgres:
     image: postgres
+  worker:
+    build:
+      dockerfile: Dockerfile
+      image: registry.heroku.com/grassrootshospitality/worker
+      args:
+        CUSTOM_CMD: ./manage.py celeryd
+    cached: true
+  dockercfg_generator:
+    image: codeship/heroku-dockercfg-generator
+    add_docker: true
+    encrypted_env_file: .codeship/heroku.env.encrypted
